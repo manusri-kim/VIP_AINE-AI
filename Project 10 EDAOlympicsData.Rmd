@@ -1,0 +1,288 @@
+# **Exploratory Data Analysis of Olympics Data**
+
+## **About the Project**
+
+Exploratory Data Analysis or EDA is an essential part of data analysis which helps you to understand data in a better way. The project focuses on data manipulation and visualization.
+
+We will perform EDA on Olympics data using R. We will focus more on analyzing and visualizing the data using R libraries and packages.
+
+## **About the Dataset**
+
+Olympics dataset is an historical data on modern olympics. It includes data from Athens 1896 to Rio 2016. It has details on summer and winter olympics.
+
+You can download the data from this link: <https://www.kaggle.com/heesoo37/120-years-of-olympic-history-athletes-and-results>
+
+You will get two files after downlaoding. The primary dataset is athlete_events.csv. The noc_regions.csv has the country names associated with NOC (National Olympics Committee)
+
+The primary dataset has 15 attributes. They are:\
+1. ID - Unique number for each athlete\
+2. Name - Athlete's name\
+3. Sex - M or F\
+4. Age - Integer\
+5. Height - In centimeters\
+6. Weight - In kilograms\
+7. Team - Team name\
+8. NOC - National Olympic Committee 3-letter code\
+9. Games - Year and season\
+10. Year - Integer\
+11. Season - Summer or Winter\
+12. City - Host city\
+13. Sport - Sport\
+14. Event - Sporting Event\
+15. Medal - Gold, Silver, Bronze, or NA (No medals won)
+
+We will analyze how Olympics has evolved over time by finding out participation of countries and athletes, participation of women and medals won by different countries
+
+## **Reading the data**
+
+```{r}
+athletes = read.csv("athlete_events.csv")
+regions = read.csv("noc_regions.csv")
+```
+
+## **Initial Processing**
+
+#### head() & tail()
+
+head() function is used to view the top selected rows and tail() function is used to view the bottom rows. By default it displays 6 rows.
+
+For more info on head() and tail() refer the link: <https://www.rdocumentation.org/packages/utils/versions/3.6.2/topics/head>\
+
+```{r}
+head(athletes)
+tail(regions)
+#?head use question mark and run it if you want to know about the functions or any commands The details will be displayed in help section in the R studio
+```
+
+To display top 2 rows
+
+```{r}
+head(athletes, n= 2L)
+```
+
+#### dim(), nrow() & col()
+
+dim() function returns the number of rows and columns in the dataframe.\
+For more info on dim() function refer the link: [\[https://www.rdocumentation.org/packages/base/versions/3.6.2/topics/dim\](https://www.rdocumentation.org/packages/base/versions/3.6.2/topics/dim￼Printing)](https://www.rdocumentation.org/packages/base/versions/3.6.2/topics/dim)[\
+](https://www.rdocumentation.org/packages/base/versions/3.6.2/topics/dim￼Printing)
+
+```{r}
+a <- dim(athletes)
+print(paste0("The number of rows in the athletes data are ", a[1]))
+print(paste0("The number of columns in the athletes data are ", a[2]))
+```
+
+For more info on printing output in R refer the below links:\
+<https://r-lang.com/print-function-in-r-with-example/>\
+<https://www.geeksforgeeks.org/printing-output-of-an-r-program/>
+
+nrow() returns the number of rows in the dataframe. ncol() returns the number of columns\
+For more info on nrow() & ncol() refer the link: <https://www.rdocumentation.org/packages/base/versions/3.6.2/topics/nrow>
+
+```{r}
+nrow(athletes)
+ncol(regions)
+```
+
+#### colnames() & names()
+
+colnames() & names() returns the names of the column or attributes.\
+For more info on colnames() and names() refer the link: <https://www.rdocumentation.org/packages/base/versions/3.6.2/topics/names>\
+<https://rdrr.io/r/base/colnames.html>
+
+```{r}
+colnames(athletes)
+attributes <- names(athletes)
+attributes
+```
+
+Similarly we use rownames() to get the names of the row or index. To understand the naming functions and their operations refer the links:\
+<https://www.geeksforgeeks.org/naming-rows-and-columns-of-a-matrix-in-r-programming-rownames-and-colnames-function/>\
+<https://www.geeksforgeeks.org/change-column-name-of-a-given-dataframe-in-r/>
+
+## **Merging the dataframes**
+
+We will merge two dataframes athletes and regions by NOC column. We will use the merge() function and left join.
+
+For more info on merge() and types of joins in R refer the link: <https://www.datasciencemadesimple.com/join-in-r-merge-in-r/>
+
+```{r}
+athletes_df <- merge(x = athletes, y= regions, by= "NOC")
+dim(athletes_df)
+names(athletes_df)
+```
+
+From the output we can see that the column names are not consistent. The first letter of newly added columns are not in caps. We will make changes here to match the other columns.
+
+```{r}
+colnames(athletes_df)[16] <- "Region"
+colnames(athletes_df)[17] <- "Notes"
+names(athletes_df)
+```
+
+## **Data Description**
+
+#### str()
+
+str() function returns the data type of each column in a dataframe.\
+For more info on str() refer the links:\
+<https://datatofish.com/data-type-dataframe-r/>\
+<https://www.rdocumentation.org/packages/utils/versions/3.6.2/topics/str>
+
+```{r}
+str(athletes_df)
+```
+
+#### summary()
+
+summary() functions returns the max & min, quartiles, mean and NA's for numeric or integer data type. It will not work on string or character data type.\
+For more info on summary() refer the link: <https://www.rdocumentation.org/packages/base/versions/3.6.2/topics/summary>
+
+```{r}
+summary(athletes_df$Age)
+```
+
+If the data contains categorical data or levels (can be numeric) then the data type of that column should be factors. If it is not factors then it should be converted to factors using the function as.factor() function. \
+For more info on as.factor() refer the link: <https://www.rdocumentation.org/packages/h2o/versions/2.4.3.11/topics/as.factor>\
+<https://www.tutorialspoint.com/r/r_factors.htm>
+
+```{r}
+athletes_df$Sex <- as.factor(athletes_df$Sex)
+summary(athletes_df$Sex)
+```
+
+If you have to convert more than one columns then you can use lapply() function. Apply function in R is primarily used to avoid explicit uses of loop constructs. lapply() function is useful for performing operations on list objects and returns a list object of same length of original set. Lapply in R takes list, vector or data frame as input and gives output in list.\
+For more info on apply() functions and its types refer the links below:\
+<https://www.guru99.com/r-apply-sapply-tapply.html>\
+<https://www.rdocumentation.org/packages/base/versions/3.6.2/topics/lapply>\
+<https://www.r-bloggers.com/2016/03/apply-lapply-rapply-sapply-functions-in-r/>
+
+```{r}
+cols = c("Team", "Season", "City", "Sport", "Medal", "Region")
+athletes_df[cols]= lapply(athletes_df[cols], factor)
+str(athletes_df)
+summary(athletes_df)
+```
+
+Below code is used if you have to use the whole dataframe. It will identify the columns which are categorical or discrete and separate them to levels. It is important to convert these columns to factors if they are not in factors. It will give better results while performing statistical analysis or while building machine learning models.
+
+```{r}
+factor_data <- as.data.frame(unclass(athletes),stringsAsFactors = TRUE)
+str(factor_data)
+```
+
+as.data.frame() converts any data type to dataframe. While reading the data or creating a dataframe where you have categorical type of data then make sure that stringsAsFactors is TRUE. By default it is fault. unclass() returns (a copy of) its argument with its class attribute removed. \
+For more info on as.data.frame() and unclass() refer the links below:\
+[[https://rdrr.io/r/base/class.html](https://rdrr.io/r/base/class.html￼https://www.rdocumentation.org/packages/base/versions/3.6.2/topics/as.data.￼For)](https://rdrr.io/r/base/class.html)[\
+[https://www.rdocumentation.org/packages/base/versions/3.6.2/topics/as.data.](https://rdrr.io/r/base/class.html￼https://www.rdocumentation.org/packages/base/versions/3.6.2/topics/as.data.￼For)](https://rdrr.io/r/base/class.html￼https://www.rdocumentation.org/packages/base/versions/3.6.2/topics/as.data.￼For)
+
+For more details on converting character to factor refer [<https://statisticsglobe.com/convert-character-to-factor-in-r>](https://statisticsglobe.com/convert-character-to-factor-in-r){.uri}
+
+## **Null Values**
+
+A null value indicates lack of values. It is important for us to check the null value in the data for proper analysis. In general R supports NULL, NA, NaN and Inf/-Inf (<https://www.r-bloggers.com/2018/07/r-null-values-null-na-nan-inf/>) \
+We will count the number of null values in each column using sapply() function. To check the null values is.na() is used and sum() function is used to get the total values.\
+For more info on sapply() refer the link: <https://www.geeksforgeeks.org/applying-a-function-over-an-object-in-r-programming-sapply-function/>
+
+```{r}
+sapply(athletes_df, function(x)sum(is.na(x)))
+```
+
+We will print the column names and the total null values in those columns. unname() function is used to remove the names or dimnames from an Object. \
+For more info on uname() refer the link: <https://www.geeksforgeeks.org/remove-names-or-dimnames-from-an-object-in-r-programming-unname-function/>
+
+```{r}
+null_cols <- sapply(athletes_df, function(x) sum(is.na(x)))
+null_cols <- null_cols[null_cols>0]
+print(paste0(names(null_cols)," :",unname(null_cols)))
+```
+
+## **Analysis and Interpretation**
+
+Let us do some basic and simple analysis on data. \
+We will create a subset of data from athletes_df which contains details of athletes from India. We will use subset() function. \
+For more info on subset() refer the link: <https://www.rdocumentation.org/packages/base/versions/3.6.2/topics/subset>
+
+```{r}
+India_details = subset(athletes_df, Region == 'India')
+head(India_details, 3L)
+dim(India_details)
+```
+
+Let us create a subset which has the details of athletes from Germany and New Zealand
+
+```{r}
+details_2 = subset(athletes_df, Region== c('Germany','New Zealand'))
+dim(details_2)
+```
+
+#### **Top ten countries in terms of participation**
+
+We will identify the top ten countries who have participated the Olympics since 1896.
+
+```{r}
+top_countries = summary(athletes_df$Region)
+top_countries[1:10]
+```
+
+Let us use a simple bar plot to visualize the top ten participating nations. For more info on barplot() function refer the link: <https://www.tutorialspoint.com/r/r_bar_charts.htm>
+
+```{r}
+barplot(top_countries[1:10],las=2, cex.names=0.70,xlab="Country",ylab="Athletes Count",col="blue",main="Top Ten Participating Countries",border="red")
+```
+
+#### Age distribution
+
+We will plot the distribution of age using histogram.\
+Before that we will clear out the Null values.from Age column. complete.cases() functions returns the dataframe without null values. For more info on complete.cases() refer the link <https://statisticsglobe.com/complete-cases-in-r-example/>
+
+```{r}
+not_null_age = athletes_df[complete.cases(athletes_df$Age), ]
+summary(not_null_age$Age) #There is no null value
+```
+
+Install ggplot2 package if it is not in the library using install.packages("ggplot2"). Use qplot() from the package to plot a histogram. For more info on qplot() and ggplot2 refer the links:\
+<http://www.sthda.com/english/wiki/qplot-quick-plot-with-ggplot2-r-software-and-data-visualization>\
+<http://r-statistics.co/ggplot2-Tutorial-With-R.html>
+
+```{r}
+#install.packages("ggplot2")
+library(ggplot2)
+qplot(not_null_age$Age, geom = "histogram",xlab= "Age", ylab = "Athletes", bins= 30, main = "Age Distribution")
+```
+
+#### Weight Distribution
+
+We will plot a histogram to understand the weight distribution of both male and female athletes
+
+```{r}
+weight_not_null = athletes_df[complete.cases(athletes_df$Weight),]
+qplot(Weight, data = weight_not_null, geom = "histogram", bins= 50, fill= Sex, ylab = "Athletes Count", main = "Weight Distribution")
+```
+
+##  Medals
+
+Let us print the total number of gold medals won in Olympics since the beginning by individual athletes
+
+```{r}
+print(paste0("The total gold medal count is ", summary(athletes_df$Medal)[2]))
+```
+
+We will create a subset of athletes who won gold medals
+
+```{r}
+gold_medal = subset(athletes_df, Medal == "Gold")
+```
+
+Top ten countries with highest number of gold medals
+
+```{r}
+noquote(names(summary(gold_medal$Region)[1:10]))
+```
+
+We will use a bar plot to visualize the top ten countries with gold medals
+
+```{r}
+gold_nations = summary(gold_medal$Region)[1:10]
+barplot(gold_nations[1:10],las=2, cex.names=0.70,xlab="Country",ylab="Gold Medals",col="blue",main="Top Ten Countries with Gold Medals",border="red")
+```
